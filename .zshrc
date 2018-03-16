@@ -14,7 +14,7 @@ function p9kdefaults(){
 
   #POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator context dir vcs)
   #POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs vi_mode time)
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(time root_indicator context dir vcs background_jobs status command_execution_time vi_mode)
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(time root_indicator context $kubectl dir $vcs background_jobs status command_execution_time vi_mode)
   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
 
   POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%F{cyan}\u256D\u2500%f"
@@ -56,18 +56,66 @@ function p9kdefaults(){
   POWERLEVEL9K_VI_COMMAND_MODE_STRING='VICMD'
   POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND='blue'
 }
+
+# ===== Git-related (+P9k) =====================================================
+if type git >/dev/null; then
+  antigen bundle git
+  type tig        >/dev/null && antigen bundle tig
+
+  vcs=vcs
+  # ===== Custom shortening of git branch ==========
+  function +vi-git-modbranch() {
+    local branch
+    branch=$hook_com[branch]
+    branch=$(echo $branch | sed 's@matthewh/\([^/]*\)/.*@\1@g')
+    if [[ $hook_com[branch] != "$branch" ]]; then
+      hook_com[branch]="[$branch]"
+    fi
+  }
+
+  POWERLEVEL9K_VCS_GIT_HOOKS=(git-modbranch vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname)
+fi
+
+# ===== Custom kubectl segment to show active config (P9k) =====================
+if type kubectl >/dev/null 2>&1; then
+  kubectl=custom_kubectl_config
+
+  # ===== Custom segment for showing config ========
+  function zsh_kubectl_config(){
+    local a=(${(s./.)KUBECONFIG})
+    if [[ -z $a ]]; then
+      return
+    fi
+    if [[ ${a[-1]} == 'config' ]]; then
+      namespace=${a[-2]}
+    else
+      namespace=${a[-1]}
+    fi
+    #color='%F{magenta}'
+    #echo -n "%{$color%}$namespace%{%f%}"
+    echo -n "$namespace%{%f%}"
+  }
+  POWERLEVEL9K_CUSTOM_KUBECTL_CONFIG="zsh_kubectl_config"
+  POWERLEVEL9K_CUSTOM_KUBECTL_CONFIG_BACKGROUND="black"
+  POWERLEVEL9K_CUSTOM_KUBECTL_CONFIG_FOREGROUND="red"
+  # ================================================
+fi
+
+# ===== Load P9k ===============================================================
 p9kdefaults
 POWERLEVEL9K_INSTALLATION_PATH=$ANTIGEN_BUNDLES/ionsquare/powerlevel9k
 antigen theme ionsquare/powerlevel9k powerlevel9k
+
+# ===== IBM work-related plugins ===============================================
+antigen bundle git@github.ibm.com:matthewh/zsh-plugins.git cedp-bluegroups
+type gluster    >/dev/null && antigen bundle git@github.ibm.com:matthewh/zsh-plugins.git cedp-gluster
 
 # ===== Plugins without special settings =======================================
 antigen bundle sudo
 antigen bundle zsh-completions
 antigen bundle colored-man-pages
-antigen bundle zshmarks
+antigen bundle jocelynmallon/zshmarks
 type pygmentize >/dev/null && antigen bundle colorize
-type git        >/dev/null && antigen bundle git
-type tig        >/dev/null && antigen bundle tig
 type composer   >/dev/null && antigen bundle composer
 type docker     >/dev/null && antigen bundle docker
 type ansible    >/dev/null && antigen bundle ansible
@@ -164,7 +212,61 @@ shell-forward-word() {
 bindkey "[1;6C" shell-forward-word
 zle -N shell-forward-word
 
-# ===== Dynamically change prompt styling ======================================
+# ===== Aliases ================================================================
+alias grep='\grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} --exclude ".*.sw[op]"'
+alias ll='\ls -lp --group-directories-first --color=auto'
+alias a=alsamixer
+if [[ -d ~/.config/awesome ]]; then
+  alias eA='cd ~/.config/awesome && vim rc.lua'
+  alias cA='cd ~/.config/awesome'
+fi
+alias eZ='cd ~ && vim .zshrc'
+
+# zshmarks aliases
+alias j=jump
+alias b=bookmark
+alias s=showmarks
+
+# Screenshot region to clipboard
+alias scrotclip='scrot -s /tmp/scrotcliptemp.png --select && xclip -selection c -t image/png /tmp/scrotcliptemp.png && rm /tmp/scrotcliptemp.png'
+
+# Override ghostscript command to do git status instead
+alias gs='git status'
+
+if type "task" > /dev/null; then
+  alias ta='task add +work'
+  alias tl='task log +work'
+fi
+
+if type "irssi" > /dev/null; then
+  alias irssi='TERM=screen-256color irssi'
+fi
+
+if [[ -d "$HOME/.config/composer/vendor/bin" ]]; then
+  export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+fi
+
+if [[ -f $HOME/.env.zshrc ]]; then
+  # Environment-dependent settings
+  source $HOME/.env.zsh
+fi
+
+# ===== Move this to its own plugin later ======================================
+
+function p9kadd(){
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=($POWERLEVEL9K_LEFT_PROMPT_ELEMENTS $1)
+  source $POWERLEVEL9K_INSTALLATION_PATH/powerlevel9k.zsh-theme
+}
+function p9kremove(){
+  a=($POWERLEVEL9K_LEFT_PROMPT_ELEMENTS)
+  a=("${(@)a:#$1}")
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=($a)
+
+  echo $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+
+  source $POWERLEVEL9K_INSTALLATION_PATH/powerlevel9k.zsh-theme
+}
+
 # Change prompt theme
 function chp(){
   # Set baseline values
@@ -174,11 +276,17 @@ function chp(){
   case "$1" in
     paste)
       #DEFAULT_USER=matthewh
-      POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR=""
+      #POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR="#"
+      #POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR="#"
+      POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR="»"
       POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=""
-      POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%F{cyan}#%f"
-      POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%F{cyan}$%f "
-      POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator context dir)
+
+      #POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%F{cyan}#%f"
+      #POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%F{cyan}$%f "
+      POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%F{cyan}\u256D\u2500%f"
+      POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%F{cyan}\u2570»%f "
+      
+      POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator context custom_kubectl_config dir)
       POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
       POWERLEVEL9K_HOME_ICON=''
       POWERLEVEL9K_HOME_SUB_ICON=''
@@ -219,43 +327,6 @@ function chp(){
       ;;
   esac
 
-  source ~/.oh-my-zsh/custom/themes/powerlevel9k/powerlevel9k.zsh-theme
+  source $POWERLEVEL9K_INSTALLATION_PATH/powerlevel9k.zsh-theme
 }
-
-# ===== Aliases ================================================================
-alias grep='\grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn} --exclude ".*.sw[op]"'
-alias ll='\ls -lp --group-directories-first --color=auto'
-alias a=alsamixer
-alias eA='cd ~/.config/awesome && vim rc.lua'
-alias cA='cd ~/.config/awesome'
-alias eZ='cd ~ && vim .zshrc'
-
-# zshmarks aliases
-alias j=jump
-alias b=bookmark
-alias s=showmarks
-
-# Screenshot region to clipboard
-alias scrotclip='scrot -s /tmp/scrotcliptemp.png --select && xclip -selection c -t image/png /tmp/scrotcliptemp.png && rm /tmp/scrotcliptemp.png'
-
-# Override ghostscript command to do git status instead
-alias gs='git status'
-
-if type "task" > /dev/null; then
-  alias ta='task add +work'
-  alias tl='task log +work'
-fi
-
-if type "irssi" > /dev/null; then
-  alias irssi='TERM=screen-256color irssi'
-fi
-
-if [[ -d "$HOME/.config/composer/vendor/bin" ]]; then
-  export PATH="$HOME/.config/composer/vendor/bin:$PATH"
-fi
-
-if [[ -f $HOME/.env.zshrc ]]; then
-  # Environment-dependent settings
-  source $HOME/.env.zsh
-fi
 
