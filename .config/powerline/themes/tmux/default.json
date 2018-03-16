@@ -1,0 +1,19 @@
+{
+	"segments": {
+		"right": [
+      {
+				"function": "powerline.segments.tmux.attached_clients",
+				"args": {
+					"minimum": 2
+				}
+      },
+			{
+				"function": "powerline.segments.common.sys.uptime",
+				"priority": 50
+			},
+			{
+				"function": "powerline.segments.common.net.hostname"
+			}
+		]
+	}
+}

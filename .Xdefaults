@@ -1,0 +1,126 @@
+!-------------------------------------------------------------------------------
+! Xft settings
+!-------------------------------------------------------------------------------
+
+!Xft.antialias:              false
+!Xft.rgba:                   rgb
+!Xft.hinting:                true
+!Xft.hintstyle:              hintslight
+
+!-------------------------------------------------------------------------------
+! UXterm settings
+!-------------------------------------------------------------------------------
+
+! Alt as meta
+UXTerm*metaSendsEscape: true
+UXTerm*fullscreen: never
+UXTerm.omitTranslation: fullscreen
+
+! Keymap
+UXTerm.vt100.translations: #override \n\
+  Ctrl <Key> minus: smaller-vt-font() \n\
+  Ctrl <Key> plus: larger-vt-font()
+
+! xterm font
+UXTerm*faceName: xft:Knack Nerd Font
+!UXTerm*faceName: xft:DejaVu Sans Mono for Powerline:antialias=true
+!UXTerm*faceSize: 7
+UXTerm.termName: xterm-256color
+
+UXTerm*faceSize: 7.0
+UXTerm*faceSize1: 6.0
+UXTerm*faceSize2: 7.0
+UXTerm*faceSize3: 8.0
+UXTerm*faceSize4: 9.0
+UXTerm*faceSize5: 10.0
+UXTerm*faceSize6: 12.0
+
+!-------------------------------------------------------------------------------
+! URxvt settings
+! Colours lifted from Solarized (http://ethanschoonover.com/solarized)
+! More info at:
+! http://pod.tst.eu/http://cvs.schmorp.de/rxvt-unicode/doc/rxvt.1.pod
+!-------------------------------------------------------------------------------
+
+URxvt.depth:                32
+URxvt.transparent:          false
+URxvt.fading:               0
+! URxvt.urgentOnBell:         true
+! URxvt.visualBell:           true
+URxvt.loginShell:           true
+URxvt.internalBorder:       3
+URxvt.lineSpace:            0
+
+! Fonts
+!URxvt.allow_bold:           false
+!/* URxvt.font:                 -*-terminus-medium-r-normal-*-12-120-72-72-c-60-iso8859-1 */
+!URxvt*font: xft:Monospace:pixelsize=12
+!URxvt*boldFont: xft:Monospace:pixelsize=12
+!
+!! Fix font space
+!URxvt*letterSpace: -1
+
+!URxvt*font: xft:Anonymice Powerline:antialias=true:pixelsize=12
+URxvt*font: xft:Anonymice Powerline:pixelsize=12
+!URxvt*boldFont: xft:DejaVu Sans Mono:style=bold:antialias=true:pixelsize=11
+!URxvt*italicFont: xft:DejaVu Sans Mono:style=italic:antialias=true:pixelsize=11
+!URxvt*boldItalicFont: xft:DejaVu Sans Mono:style=bolditalic:antialias=true:pixelsize=11
+
+! Scrollbar
+URxvt.scrollStyle:          rxvt
+URxvt.scrollBar:            false
+
+! Perl extensions
+URxvt.perl-ext-common:      default,matcher
+URxvt.matcher.button:       1
+URxvt.urlLauncher:          firefox
+
+! Cursor
+URxvt.cursorBlink:          true
+URxvt.cursorColor:          #657b83
+URxvt.cursorUnderline:      false
+
+! Pointer
+URxvt.pointerBlank:         true
+
+!-------------------------------------------------------------------------------
+! Common colour settings
+!-------------------------------------------------------------------------------
+
+*background: #000000
+*foreground: #dddddd
+!!*fading: 40
+
+! BLACK
+*.color0:       #000000
+*.color8:       #363636
+
+! RED
+*.color1:       #c0291b
+*.color9:       #f44f4f
+
+! GREEN
+*.color2:       #218048
+*.color10:      #27ae60
+
+! YELLOW
+*color3:        #f6bb42
+*color11:       #ffce54
+
+! BLUE
+*.color4:       #005f87
+*.color12:      #00aad4
+
+! MAGENTA
+*color5:        #967adc
+*color13:       #ac92ec!
+
+! CYAN
+*.color6:       #27aeae
+*.color14:      #31dddd
+
+! WHITE
+*.color7:       #dddddd
+*.color15:      #ffffff
+
+
