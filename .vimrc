@@ -52,6 +52,7 @@ set nojoinspaces        " Don't add 2 spaces after . when joining
 set diffopt+=iwhite     " Ignore whitespace mismatch in diff
 set wildmenu            " Show some autocomplete options in status bar
 set backspace=2         " Make backspace key work properly
+set hidden              " Don't discard undo history when changing buffers
 " Load filetype-specific plugins if exists
 filetype plugin indent on
 
