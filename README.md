@@ -4,7 +4,7 @@
 # Clone repo with submodules
 cd ~
 git init
-git remote add origin git@github.com:ionsquare/dotfiles.git
+git remote add origin https://github.com/ionsquare/dotfiles.git
 git pull origin master
 git submodule update --init --recursive
 
