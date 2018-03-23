@@ -9,7 +9,7 @@ git pull origin master
 git submodule update --init --recursive
 
 # Install vundle plugins
-vim +PlugInstall
+vim +PluginInstall
 
 # Install zsh plugins
 zsh
