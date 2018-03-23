@@ -71,6 +71,7 @@ nmap <leader>ex :tabnew ~/.Xdefaults<cr>
 
 "===== Laravel Mappings ==========================
 nmap <Leader>lr :e routes/web.php<cr>
+nmap <Leader>le :e .env<cr>
 nmap <Leader>lm :!php artisan make:
 nmap <Leader>lfc :e app/Http/Controllers/<cr>
 nmap <Leader>lfm :e app/<cr>
