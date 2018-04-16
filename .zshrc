@@ -3,14 +3,12 @@ antigen use oh-my-zsh
 
 # ===== Powerlevel9k ===========================================================
 function p9kdefaults(){
-  unset DEFAULT_USER
   unset POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR
   unset POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR
 
   # Segments
   POWERLEVEL9K_MODE="nerdfont-complete"
   POWERLEVEL9K_TIME_FORMAT="%D{%H:%M}"
-  #DEFAULT_USER=matthewh
 
   #POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator context dir vcs)
   #POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs vi_mode time)
@@ -27,8 +25,10 @@ function p9kdefaults(){
   # Colours and format
   POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 
+  DEFAULT_USER=matthewh
   POWERLEVEL9K_CONTEXT_DEFAULT_BACKGROUND='black'
   POWERLEVEL9K_CONTEXT_DEFAULT_FOREGROUND='71'    # green
+  POWERLEVEL9K_CONTEXT_REMOTE_FOREGROUND='yellow'
   POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND='red'
 
   POWERLEVEL9K_DIR_HOME_FOREGROUND='38'
@@ -103,7 +103,7 @@ fi
 
 # ===== Load P9k ===============================================================
 p9kdefaults
-POWERLEVEL9K_INSTALLATION_PATH=$ANTIGEN_BUNDLES/ionsquare/powerlevel9k
+POWERLEVEL9K_INSTALLATION_PATH=$ADOTDIR/bundles/ionsquare/powerlevel9k
 antigen theme ionsquare/powerlevel9k powerlevel9k
 
 # ===== IBM work-related plugins ===============================================
@@ -275,7 +275,6 @@ function chp(){
   # Change based on input
   case "$1" in
     paste)
-      #DEFAULT_USER=matthewh
       #POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR="#"
       #POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR="#"
       POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR="»"
@@ -330,3 +329,7 @@ function chp(){
   source $POWERLEVEL9K_INSTALLATION_PATH/powerlevel9k.zsh-theme
 }
 
+sssh(){
+  # Keep trying to reconnect
+  while true; do command ssh -o ConnectTimeout=10 "$@"; [ $? -eq 0 ] && break || sleep 1; done
+}
