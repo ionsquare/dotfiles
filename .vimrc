@@ -63,9 +63,12 @@ set hidden              " Don't discard undo history when changing buffers
 filetype plugin indent on
 
 "===== Powerline =================================
-python3 from powerline.vim import setup as powerline_setup
-python3 powerline_setup()
-python3 del powerline_setup
+try
+  python3 from powerline.vim import setup as powerline_setup
+  python3 powerline_setup()
+  python3 del powerline_setup
+catch
+endtry
 set laststatus=2
 set t_Co=256
 
