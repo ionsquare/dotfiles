@@ -6,6 +6,8 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 map <leader>f :NERDTreeFind<cr>
 map <C-N> :NERDTreeToggle<CR>
 let NERDTreeHijackNetrw = 0
+" delete buffer without quitting
+nnoremap <leader>q :bp<cr>:bd #<cr>
 
 "===== CtrlP Mappings ============================
 nmap <C-P> :CtrlP<cr>
@@ -36,17 +38,21 @@ let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
 "===== Colour scheme stuff =======================
 syntax on
-let g:jellybeans_overrides = {
-\    'background': { 'ctermbg': 'none', '256ctermbg': 'none' },
-\    'search': { 'guibg': '00ff00', 'guifg': '000000', 'attr': 'bold' },
-\}
-colo jellybeans
+try
+  let g:jellybeans_overrides = {
+  \    'background': { 'ctermbg': 'none', '256ctermbg': 'none' },
+  \    'search': { 'guibg': '00ff00', 'guifg': '000000', 'attr': 'bold' },
+  \}
+  colo jellybeans
+catch /^Vim\%((\a\+)\)\=:E185/
+  colo koehler
+endtry
 
 "===== General settings ==========================
 set nosmartindent cindent cinkeys-=0#
 set number hlsearch incsearch lbr
 set ts=2 shiftwidth=2 expandtab
-set mouse=a
+set mouse=cin
 set foldmethod=indent foldlevelstart=99
 set nojoinspaces        " Don't add 2 spaces after . when joining
 set diffopt+=iwhite     " Ignore whitespace mismatch in diff
@@ -57,6 +63,9 @@ set hidden              " Don't discard undo history when changing buffers
 filetype plugin indent on
 
 "===== Powerline =================================
+python3 from powerline.vim import setup as powerline_setup
+python3 powerline_setup()
+python3 del powerline_setup
 set laststatus=2
 set t_Co=256
 
