@@ -19,7 +19,7 @@ function p9kdefaults(){
   POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%F{cyan}\u2570\uF460%f "
 
   POWERLEVEL9K_SHORTEN_STRATEGY=truncate_with_package_name
-  POWERLEVEL9K_DIR_PACKAGE_FILES=(powerlevel9k.json composer.json)
+  POWERLEVEL9K_DIR_PACKAGE_FILES=(powerlevel9k.json .powerlevel9k.json composer.json)
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=50
 
   # Colours and format
@@ -82,14 +82,19 @@ if type kubectl >/dev/null 2>&1; then
 
   # ===== Custom segment for showing config ========
   function zsh_kubectl_config(){
-    local a=(${(s./.)KUBECONFIG})
-    if [[ -z $a ]]; then
+    if [[ -z $KUBECONFIG ]]; then
       return
     fi
-    if [[ ${a[-1]} == 'config' ]]; then
-      namespace=${a[-2]}
+
+    local a="${${KUBECONFIG#*co-creators/}%%/*}"
+    if [[ -z $a ]]; then
+      namespace=${KUBECONFIG##*/}
     else
-      namespace=${a[-1]}
+      namespace=$a
+    fi
+
+    if [[ ${KUBECONFIG##*/} != "config" ]]; then
+      namespace="${namespace}.${KUBECONFIG##*.}"
     fi
     #color='%F{magenta}'
     #echo -n "%{$color%}$namespace%{%f%}"
@@ -103,9 +108,8 @@ fi
 
 # ===== Load P9k ===============================================================
 p9kdefaults
-POWERLEVEL9K_INSTALLATION_PATH=$ADOTDIR/bundles/ionsquare/powerlevel9k
+export POWERLEVEL9K_INSTALLATION_PATH=$HOME/.antigen/bundles/ionsquare/powerlevel9k
 antigen theme ionsquare/powerlevel9k powerlevel9k
-
 # ===== IBM work-related plugins ===============================================
 antigen bundle git@github.ibm.com:matthewh/zsh-plugins.git cedp-bluegroups
 type gluster    >/dev/null && antigen bundle git@github.ibm.com:matthewh/zsh-plugins.git cedp-gluster
@@ -128,6 +132,7 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen apply
 
 # ===== Syntax Highlighting (must be after `antigen apply`) ====================
+typeset -gA ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 ZSH_HIGHLIGHT_STYLES[cursor]='bold'
 
